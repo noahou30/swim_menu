@@ -1,3 +1,66 @@
+<?php
+$dsn='mysql:dbname=tt_461_99sv_coco_com;host=localhost';
+$user='tt-461.99sv-coco';
+$password='Ku6vA7Gz';
+$pdo=new PDO($dsn,$user,$password,
+array(PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING)
+);
+
+session_start();
+$id=$_SESSION['id'];
+
+if(empty($id)){
+    echo "ログインユーザーのみ利用できます。".'</br>'.
+                '<a href="mainpage.php">メインページへ戻る</a>';
+                exit();
+}
+//ログイン時のみ
+if(!empty($id)){
+    $upfile=$_FILES['menu'];
+    if(isset($upfile)){
+        //アップロードエラー処理文　
+        if($upfile['error'] > 0) {
+            $error="ファイルアップロードに失敗しました。";
+        }
+    $tmp_name = $upfile['tmp_name'];
+        //ファイルタイプチェック
+    if(!preg_match('/\.gif$|\.png$|\.jpg$|\.jpeg$/i', $tmp_name))
+        $error="ファイルタイプエラー".'<br>'."ファイル拡張子はjpg,jpeg,png,gifのいずれかにしてください。";
+    }
+     if(preg_match('/\.gif$|\.png$|\.jpg$|\.jpeg$/i', $tmp_name)){
+        $bname = basename($_FILES['name']);
+        $name = mb_convert_encoding($bname, "UTF-8", "AUTO");
+       
+        //パスを発行して違う変数に入れる
+        $path = "../menu/$name";
+        $move=move_uploaded_file($tmp_name, $path);
+        if($move==false){
+            $error="ファイルの移動に失敗しました。";
+        }
+        if($move !==false){
+         try{
+        $sql=$pdo->prepare('INSERT INTO swim_menu (id,menu,distance,time,age,sex,level,aim,comment) VALUES (:id,:menu,:distance,:time,:age,:sex,:level,:aim,:comment)');
+        $sql->bindParam(':id',$id,PDO::PARAM_STR);
+        $sql->bindParam(':menu',$path,PDO::PARAM_STR);
+        $sql->bindParam(':distance',$distance,PDO::PARAM_INT);
+        $sql->bindParam(':time',$time,PDO::PARAM_INT);
+        $sql->bindParam(':age',$age,PDO::PARAM_STR);
+        $sql->bindParam(':sex',$sex,PDO::PARAM_STR);
+        $sql->bindParam(':level',$level,PDO::PARAM_STR);
+        $sql->bindParam(':aim',$aim,PDO::PARAM_STR);
+        $sql->bindParam(':comment',$comment,PDO::PARAM_STR);
+        $sql->execute();
+        } catch (Exception $e){
+            if (isset($e)){
+                $error="データベースエラー";
+            }
+        }
+    }
+    }
+    }
+?>
+    
+
 <!DOCTYPE HTML>
 <html lang="ja">
  <head>
@@ -8,14 +71,20 @@
  <!--ヘッダー-->
  <a href="mainpage.php">戻る</a>
  <!--ここから本体-->
- <form method="POST" action="">
+ <form method="POST" action="" enctype="multipart/form-data">
  <p>
 <label> メニュー画像投稿<label/><br/>
 画像ファイルをアップロードしてください。</br>
-<input type="file" name="menu">
+大きさは30000byteまで</br>
+拡張子は.jpg,.png,.gifです。</br>
+<input type="hidden" name="MAX_FILE_SIZE" value="30000" />
+<input type="file" name="menu" accept="image/*"></br>
+</form>
+<?php echo $error; ?>
 </p>
 <p>
 カンマ','等は使用せず、半角数字のみで入力してください。</br>
+<form method="POST" action="" >
 <label> 合計距離(m)<label/>
 <input type="text" name="distance"/></br>
 <label> 合計時間(分)<label/>
@@ -71,6 +140,9 @@
 <option value="long">ディスタンス</option>
 </select>
 </p>
+<p>
+<label>コメント(任意入力)</label></br>
+<textarea rows="4" cols="40" name="comment" placeholder="メニューや使用者に対する補足情報等があれば入力してください。"/></textarea></br>
 <input type="submit" name="upload" value="投稿"/>
 </form>
 </body>
