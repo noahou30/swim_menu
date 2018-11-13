@@ -1,7 +1,7 @@
 <?php
-$dsn='データベース名';
-$user='ユーザーID';
-$password='パスワード';
+$dsn='mysql:dbname=tt_461_99sv_coco_com;host=localhost';
+$user='tt-461.99sv-coco';
+$password='Ku6vA7Gz';
 $pdo=new PDO($dsn,$user,$password,
 array(PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING)
 );
@@ -43,10 +43,10 @@ if(!empty($id)){
             }
             $tmp_name = $upfile['tmp_name'];
              //ファイルタイプチェック
-            if(!preg_match('/\.gif$|\.png$|\.jpg$|\.jpeg$/i', $tmp_name)){
+            if(preg_match('/.*?\.jpg|.*?\.png||.*?\.gif.*?\.jpeg/i', $tmp_name)){
                 $error="ファイルタイプエラー".'<br>'."ファイル拡張子はjpg,jpeg,png,gifのいずれかにしてください。";
             }
-            if(preg_match('/\.gif$|\.png$|\.jpg$|\.jpeg$/i', $tmp_name)){
+            if(preg_match('/.*?\.jpg|.*?\.png||.*?\.gif.*?\.jpeg/i', $tmp_name)){
                 $bname = basename($_FILES['name']);
                 $name = mb_convert_encoding($bname, "UTF-8", "AUTO");
        
