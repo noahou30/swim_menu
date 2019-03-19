@@ -13,7 +13,7 @@ if ($_POST['token'] != $_SESSION['token']){
 header('X-FRAME-OPTIONS: SAMEORIGIN');
  
 try {
-$dbh = new PDO('mysql:dbname=tt_461_99sv_coco_com;host=localhost','tt-461.99sv-coco','Ku6vA7Gz',
+$dbh = new PDO('mysql:dbname=****;host=****','****','****',
 array(PDO::ATTR_EMULATE_PREPARES => false));
 } catch (PDOException $e) {
  exit('データベース接続失敗。'.$e->getMessage());
